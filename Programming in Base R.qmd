@@ -1,0 +1,147 @@
+---
+title: "Programming in Base R"
+format: html
+editor: visual
+---
+
+## Task 1: Basic Vector Practice
+
+First we create two vectors, one corresponding to the pre-treatment measurements and one corresponding to the post-treatment measurements.
+
+```{r}
+pre_treat <- c(120,151,125,126,115,132,132,129,134,139,127,122,127,135,133,128,147,138,140,132)
+pre_treat
+
+post_treat <- c(127,145,135,122,115,122,123,126,126,129,132,146,120,114,121,120,128,120,133,115)
+post_treat
+```
+
+Next we assign names to the each of the vectors elements.
+
+```{r}
+#names the ith element in vector x Subject_i
+names(pre_treat) <- paste("Subject", 1:20, sep = '_') 
+
+#names the ith element in vector y Subject_i
+names(post_treat) <- paste("Subject", 1:20, sep = '_') 
+```
+
+Next we calculate the change in blood pressure observed for each patient after treatment.
+
+```{r}
+change_in_bp <- post_treat - pre_treat
+change_in_bp
+```
+
+Now we calculate the average decrease in blood pressure across all patients.
+
+```{r}
+avg_change <- mean(change_in_bp)
+avg_change
+```
+
+The average change in blood pressure is -5.65, so on average the patients saw a decrease in blood pressure (indicating that the treatment was effective). Next, we want to determine which specific patients saw a decrease in blood pressure.
+
+```{r}
+success_patients <- which(change_in_bp < 0)
+success_patients
+```
+
+Alternatively we can obtain a vector of patients which saw a decrease in blood pressures as follows:
+
+```{r}
+#creates a vector subset of change_in_bp vector consisting of patients that saw a positive change, i.e. decrease in bp
+positive_result <- change_in_bp[change_in_bp < 0]
+positive_result
+```
+
+Lastly, we calculate the average decrease in blood pressure amongst patients who saw a decrease in blood pressure.
+
+```{r}
+avg_change_success_patients <- mean(positive_result)
+avg_change_success_patients
+```
+
+So amongst those who saw a decrease in blood pressure after treatment, on average there was a decrease in -10.6 points in blood pressure. Very good!
+
+## Task 2: Basic Data Frame Practice
+
+First, we create a data frame consisting of data from the previous task.
+
+```{r}
+patient <- 1:20
+pre_bp <- pre_treat
+post_bp <- post_treat
+diff_bp <- change_in_bp
+bp_df <- data.frame(patient, pre_bp, post_bp, diff_bp)
+bp_df
+```
+
+Next we return only the rows where the difference in blood pressures is negative. Note that this creates a new, subset data frame.
+
+```{r}
+pos_change_bp_df <- subset(bp_df, diff_bp < 0)
+pos_change_bp_df
+```
+
+Now we create a new column for the original data frame which consists of TRUE if the corresponding post_bp observation less than 120, and FALSE if the corresponding post_bp observation is greater than 120.
+
+```{r}
+#creates vector of boolean values based on if post_bp elements are < 120 or not
+low_bp <- bp_df$post_bp < 120
+
+#creates new column for bp_df data frame by referencing low_bp vector as a column
+bp_df$low_bp <- low_bp
+bp_df
+```
+
+Lastly we print the data frame so that it looks like a nice table of data entries. 
+
+```{r}
+knitr::kable(bp_df, align = "ccccc")
+```
+
+## Task 3: List Practice
+
+First we create a data frame similar to the one in the previous task with new data from the experiment where the treatment was just a placebo. 
+
+```{r}
+#data frame with patient number, pre "treatment" blood pressure, post "treatment" blood pressure, and the difference in blood pressure
+patient <- 1:10
+pre_bp <- c(138,135,147,117,152,134,114,121,131,130)
+placebo_bp <- c(105,136,123,130,134,143,135,139,120,124)
+diff_bp <- placebo_bp-pre_bp
+placebo_df <- data.frame(patient, pre_bp, placebo_bp, diff_bp)
+
+#new columns with TRUE/FALSE values based on post placebo blood pressure
+low_bp <- placebo_df$placebo_bp < 120
+placebo_df$low_bp <- low_bp
+placebo_df
+```
+
+Next we create a list with two elements: the data fram from task 2 and the data frame from the previous step.
+
+```{r}
+bp_data_list <- list(treatment = bp_df, placebo = placebo_df)
+bp_data_list
+```
+
+Now we will access the first list element in 3 different ways, with the first way returning a list of length 1 consisting of the data frame, and the second and third ways returning just the data frame itself. 
+
+```{r}
+bp_data_list[1]
+```
+```{r}
+bp_data_list[[1]]
+```
+
+```{r}
+bp_data_list$treatment
+```
+
+Lastly, we access the pre_bp column from the placebo data frame in the list. 
+
+```{r}
+bp_data_list$placebo[2]
+```
+
